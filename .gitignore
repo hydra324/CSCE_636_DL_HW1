@@ -1,0 +1,8 @@
+.DS_Store
+.idea/HW1.iml
+.idea/misc.xml
+.idea/modules.xml
+.idea/vcs.xml
+.idea/inspectionProfiles/profiles_settings.xml
+.idea/.gitignore
+code/__pycache__/

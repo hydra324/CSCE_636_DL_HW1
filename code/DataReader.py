@@ -45,24 +45,32 @@ def prepare_X(raw_X):
 
 	# Feature 1: Measure of Symmetry
 	### YOUR CODE HERE
-    
+    flip_image = np.flip(raw_image,axis=2)
+    feat1 = np.absolute(raw_image-flip_image)
+    sum_func = lambda x: np.sum(x,axis=(1,2)).reshape(-1,1)
+    feat1 = sum_func(feat1)
+    feat1 = feat1/-256.
 
 	### END YOUR CODE
 
 	# Feature 2: Measure of Intensity
 	### YOUR CODE HERE
+    sum_func = lambda x: np.sum(x,axis=(1,2)).reshape(-1,1)
+    feat2 = sum_func(raw_image)
+    feat2 = feat2/256.
 	
 	### END YOUR CODE
 
 	# Feature 3: Bias Term. Always 1.
 	### YOUR CODE HERE
-	
+    n_samples = feat2.shape[0]
+    feat3 = np.ones((n_samples,1))
 	### END YOUR CODE
 
 	# Stack features together in the following order.
 	# [Feature 3, Feature 1, Feature 2]
 	### YOUR CODE HERE
-	
+    X = np.concatenate((feat3,feat1,feat2),axis=1)
 	### END YOUR CODE
     return X
 
