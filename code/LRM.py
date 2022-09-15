@@ -45,8 +45,15 @@ class logistic_regression_multiclass(object):
         # self.W = np.random.rand(n_features,self.k)
         self.W = np.zeros(shape=(n_features,self.k))
 
+        print("")
         for epoch in range(self.max_iter):
             # begin epoch
+
+            # print training progress
+            sys.stdout.write('\r')
+            sys.stdout.write("Training...epoch=%i"%(epoch))
+            sys.stdout.flush()
+
             # shuffle data and labels in unison
             indices = np.arange(n_samples)
             np.random.shuffle(indices)
@@ -69,8 +76,70 @@ class logistic_regression_multiclass(object):
                 b_start = b_end
                 b_end = min(b_start+batch_size,n_samples)
             # end epoch
+        print("")
 
 		### END YOUR CODE
+        return self
+    
+    def fit_miniBGD_print_weights(self, X, labels, batch_size):
+        """ Same as the above method for mini-Batch GD, except the it will print weights at the end of each epoch.
+        Train perceptron model on data (X,y) with mini-Batch GD.
+
+        Args:
+            X: An array of shape [n_samples, n_features].
+            labels: An array of shape [n_samples,].  Only contains 0,..,k-1.
+            batch_size: An integer.
+
+        Returns:
+            self: Returns an instance of self.
+
+        Hint: the labels should be converted to one-hot vectors, for example: 1----> [0,1,0]; 2---->[0,0,1].
+        """
+
+        n_samples, n_features = X.shape
+        # convert labels into one hot vectors
+        Y = np.zeros(shape=(n_samples,self.k))
+        Y[np.arange(n_samples),labels.astype(int)]=1
+
+        # initialize weights to zero or randomize
+        # self.W = np.random.rand(n_features,self.k)
+        self.W = np.zeros(shape=(n_features,self.k))
+
+        print("")
+        for epoch in range(self.max_iter):
+            # begin epoch
+
+            # print training progress
+            sys.stdout.write('\r')
+            sys.stdout.write("Training...epoch=%i"%(epoch))
+            sys.stdout.flush()
+
+            # shuffle data and labels in unison
+            indices = np.arange(n_samples)
+            np.random.shuffle(indices)
+            X = X[indices]
+            Y = Y[indices]
+
+            b_start = 0 # batch start (inclusive)
+            b_end = min(b_start+batch_size,n_samples) # batch end (exclusive)
+            while b_start < n_samples:
+                X_batch,Y_batch = X[b_start:b_end],Y[b_start:b_end]
+                grad = 0
+                for sample in range(X_batch.shape[0]):
+                    _x,_y = X_batch[sample],Y_batch[sample]
+                    # compute gradient using the equation grad L w.r.t W = _x @ (p-_y).T
+                    grad += self._gradient(_x,_y)
+                grad = grad/batch_size
+                # update weights
+                self.W = self.W - self.learning_rate * grad
+                # update batch start and end
+                b_start = b_end
+                b_end = min(b_start+batch_size,n_samples)
+            # end epoch
+            print("after epoch=%i, softmax weights=\n"%(epoch),self.W)
+        print("")
+
+
         return self
     
 

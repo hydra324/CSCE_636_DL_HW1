@@ -50,8 +50,15 @@ class logistic_regression(object):
         n_features = X.shape[1]
         self.W = np.zeros(shape=(n_features,))
 
+        print("Beginning training logistic classifier on 2 classes")
         for epoch in range(self.max_iter):
             # begin epoch
+
+            # print training progress
+            sys.stdout.write('\r')
+            sys.stdout.write("Training...epoch=%i"%(epoch))
+            sys.stdout.flush()
+
             # shuffle data and labels in unision
             n_samples = y.shape[0]
             indices = np.arange(n_samples)
@@ -75,8 +82,60 @@ class logistic_regression(object):
                 b_start = b_end
                 b_end = min(b_start+batch_size,n_samples)
             # end epoch
+        print("")
 
 		### END YOUR CODE
+        return self
+    
+    def fit_miniBGD_print_weights(self, X, y, batch_size):
+        """ Same as the above method, except it prints weights at the end of each epoch.
+        Train perceptron model on data (X,y) with mini-Batch Gradient Descent.
+
+        Args:
+            X: An array of shape [n_samples, n_features].
+            y: An array of shape [n_samples,]. Only contains 1 or -1.
+            batch_size: An integer.
+
+        Returns:
+            self: Returns an instance of self.
+        """
+        n_features = X.shape[1]
+        self.W = np.zeros(shape=(n_features,))
+
+        print("Beginning training logistic classifier on 2 classes")
+        for epoch in range(self.max_iter):
+            # begin epoch
+
+            # print training progress
+            sys.stdout.write('\r')
+            sys.stdout.write("Training...epoch=%i"%(epoch))
+            sys.stdout.flush()
+
+            # shuffle data and labels in unision
+            n_samples = y.shape[0]
+            indices = np.arange(n_samples)
+            np.random.shuffle(indices)
+            X = X[indices]
+            y = y[indices]
+
+            b_start = 0 # batch start (inclusive)
+            b_end = min(b_start+batch_size,n_samples) # batch end (exclusive)
+            while b_start<n_samples:
+                X_batch,y_batch = X[b_start:b_end],y[b_start:b_end]
+                grad = 0
+                for sample in range(X_batch.shape[0]):
+                    _x,_y = X_batch[sample],y_batch[sample]
+                    # compute gradient using the equation grad(E(w)) = -yx_n/(1+e^ywT.x_n)
+                    grad += self._gradient(_x,_y)
+                grad = grad/batch_size
+                # update weights
+                self.W = self.W - self.learning_rate * grad
+                # update batch start and end
+                b_start = b_end
+                b_end = min(b_start+batch_size,n_samples)
+            # end epoch
+            print("after epoch=%i, logistic weights=\n"%(epoch),self.W)
+        print("")
         return self
 
     def fit_SGD(self, X, y):
